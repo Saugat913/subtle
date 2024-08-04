@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { CiPlay1 } from 'react-icons/ci';
 import { TbPlayerTrackNext } from 'react-icons/tb';
 import { FaHome } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa6";
+import { CiPause1 } from "react-icons/ci";
 import { Link, useLocation } from "react-router-dom";
 
 
@@ -83,12 +84,12 @@ function EditorPage() {
 
     const data = useLocation();
     const projectData = data.state.projectData;
-   
-    
+
+    projectData.video = "/sample.mp4";
 
     // useEffect(() => {
     //     const loadVideo = async () => {
-            
+
     //         // try {
     //         //     const data = await readBinaryFile(videoPath + "/video.mp4", { dir: BaseDirectory.AppData });
     //         //     const base64 = btoa(String.fromCharCode(...new Uint8Array(data)));
@@ -105,7 +106,58 @@ function EditorPage() {
     //     loadVideo();
     // }, []);
 
+    const videoRef = useRef();
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
 
+    useEffect(() => {
+        const video = videoRef.current;
+
+        const handleTimeUpdate = () => {
+            setCurrentTime(video.currentTime);
+        };
+
+        const handleLoadedMetadata = () => {
+            setDuration(video.duration);
+        };
+
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+        return () => {
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        };
+    }, []);
+
+    const handleSliderChange = (e) => {
+        const newTime = e.target.value;
+        setCurrentTime(newTime);
+        videoRef.current.currentTime = newTime;
+    };
+
+    const togglePlayPause = () => {
+        const video = videoRef.current;
+        if (video.paused) {
+            video.play();
+            setIsPlaying(true);
+        } else {
+            video.pause();
+            setIsPlaying(false);
+        }
+    };
+
+    const skip = (seconds) => {
+        const video = videoRef.current;
+        video.currentTime = Math.min(Math.max(0, video.currentTime + seconds), duration);
+    };
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
 
 
     return (
@@ -121,9 +173,7 @@ function EditorPage() {
             </div>
 
             {/* Video Preview + Subtitle Section */}
-            <div className="flex flex-grow">
-
-
+            <div className="flex">
                 <div className="flex-1 flex-col bg-customGray flex  items-center  rounded p-3 mr-2">
                     <span className="text-white mt-7 mb-8">Subtitles</span>
                     <div className='flex flex-col overflow-y-scroll h-64 w-full'>
@@ -137,15 +187,22 @@ function EditorPage() {
                         <span className='text-primary_color ml-3'>Add Subtitle</span></div>
 
                 </div>
+
+
                 <div className="flex-1 flex flex-col bg-customGray items-center justify-center pl-5 pr-5 pt-3  rounded">
-                    <video className="w-10/12 bg-black mb-4" src={projectData.video} controls autoPlay></video>
-                    <input type="range" min="0" max="100" className="w-10/12 mb-3" />
+                    <video ref={videoRef} className="w-10/12 bg-black mb-4" src={projectData.video} ></video>
+                    <input type="range" min="0" className="w-10/12 mb-3" max={duration}
+                        value={currentTime}
+                        onChange={handleSliderChange} />
                     <div className="flex justify-evenly w-full">
-                        <span className="text-white ml-4">00:10:33:15</span>
+                        <span className="text-white ml-4">{formatTime(currentTime)}</span>
                         <div className="flex justify-evenly w-full">
-                            <TbPlayerTrackNext color="white" size={24} className="rotate-180" />
-                            <CiPlay1 color="white" size={24} />
-                            <TbPlayerTrackNext color="white" size={24} />
+                            <TbPlayerTrackNext color="white" size={24} className="rotate-180" onClick={() => skip(-10)} />
+                            <button onClick={togglePlayPause}>
+                                {isPlaying ? <CiPause1 color="white" size={24} /> : <CiPlay1 color="white" size={24} />}
+                            </button>
+
+                            <TbPlayerTrackNext color="white" size={24} onClick={() => skip(10)} />
                         </div>
                     </div>
                 </div>

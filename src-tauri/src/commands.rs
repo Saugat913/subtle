@@ -19,44 +19,47 @@ pub async fn init_project(video_url: String, app_handle: AppHandle) -> String {
 
     println!("Project Path:{}", project_path.to_str().unwrap());
 
-    create_dir(project_path).unwrap();
+    if !project_path.exists() {
+        let _ = create_dir(project_path);
 
-    let video_url_cloned1 = video_url.clone();
-    let video_url_cloned2 = video_url.clone();
-    let video_url_cloned3 = video_url.clone();
+        let video_url_cloned1 = video_url.clone();
+        let video_url_cloned2 = video_url.clone();
+        let video_url_cloned3 = video_url.clone();
 
-    let project_path_cloned1 = project_path.to_path_buf();
-    let project_path_cloned2 = project_path.to_path_buf();
-    let project_path_cloned3 = project_path.to_path_buf();
+        let project_path_cloned1 = project_path.to_path_buf();
+        let project_path_cloned2 = project_path.to_path_buf();
+        let project_path_cloned3 = project_path.to_path_buf();
 
-    let tasks = vec![
-        tauri::async_runtime::spawn(async move {
-            utils::convert_video_to_mono_audio(
-                video_url_cloned1.as_str(),
-                project_path_cloned1.join("audio.wav").to_str().unwrap(),
-            );
-        }),
-        tauri::async_runtime::spawn(async move {
-            generate_thumbnail(
-                video_url_cloned2.as_str(),
-                project_path_cloned2.join("thumbnail.png").to_str().unwrap(),
-                "00:00:10",
-            );
-        }),
-        tauri::async_runtime::spawn(async move {
-            convert_video_to_audio_less(
-                video_url_cloned3.as_str(),
-                project_path_cloned3.join("video.mp4").to_str().unwrap(),
-            );
-        }),
-    ];
+        let tasks = vec![
+            tauri::async_runtime::spawn(async move {
+                utils::convert_video_to_mono_audio(
+                    video_url_cloned1.as_str(),
+                    project_path_cloned1.join("audio.wav").to_str().unwrap(),
+                );
+            }),
+            tauri::async_runtime::spawn(async move {
+                generate_thumbnail(
+                    video_url_cloned2.as_str(),
+                    project_path_cloned2.join("thumbnail.png").to_str().unwrap(),
+                    "00:00:10",
+                );
+            }),
+            tauri::async_runtime::spawn(async move {
+                convert_video_to_audio_less(
+                    video_url_cloned3.as_str(),
+                    project_path_cloned3.join("video.mp4").to_str().unwrap(),
+                );
+            }),
+        ];
 
-    // Wait for all tasks to complete
-    for task in tasks {
-        task.await
-            .map_err(|e| format!("Task failed: {}", e))
-            .unwrap();
+        // Wait for all tasks to complete
+        for task in tasks {
+            task.await
+                .map_err(|e| format!("Task failed: {}", e))
+                .unwrap();
+        }
     }
+
     println!("Sending file name!");
     return video_name.to_string();
 }
