@@ -17,14 +17,15 @@
       "fs": {
         "all": true,
         "scope": [
-          "**"
-        ]
+          "$APPDATA/**"
+        ],
+        "readFile": true
       },
       "protocol": {
         "all": true,
         "asset": true,
         "assetScope": [
-          "**"
+          "$APPDATA/**"
         ]
       },
       "all": true,
@@ -41,7 +42,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost;"
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; media-src 'self' asset: https://asset.localhost"
     },
     "bundle": {
       "active": true,

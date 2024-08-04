@@ -3,10 +3,10 @@ import { CiPlay1 } from 'react-icons/ci';
 import { TbPlayerTrackNext } from 'react-icons/tb';
 import { FaHome } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-import { readBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
-import { stringify } from 'postcss';
+
+
 
 
 
@@ -54,10 +54,12 @@ const subtitle_dummy_data = [
         'end': 1
     },
 ]
-function EditorPage({ videoPath }) {
+
+
+function EditorPage() {
 
     // const [isLoaded, setisLoaded] = useState(true);
-    // const [videoUrl, setvideoUrl] = useState(videoPath);
+    // const [videoUrl, setvideoUrl] = useState("");
 
     // useEffect(async () => {
     //     // Read the video file using the fs module
@@ -79,22 +81,32 @@ function EditorPage({ videoPath }) {
     //     }
     //   }, [videoPath]);
 
+    const data = useLocation();
+    const projectData = data.state.projectData;
+   
+    
 
     // useEffect(() => {
     //     const loadVideo = async () => {
-    //         try {
-    //             const data = await readBinaryFile(videoPath);
+            
+    //         // try {
+    //         //     const data = await readBinaryFile(videoPath + "/video.mp4", { dir: BaseDirectory.AppData });
+    //         //     const base64 = btoa(String.fromCharCode(...new Uint8Array(data)));
 
-    //         } catch (error) {
-    //             console.error('Error reading file:', error);
-    //         }
-    //         const videoUrl = URL.createObjectURL(new Blob([data]));
-    //         setVideoUrl(videoUrl);
-    //         setIsLoaded(true);
+    //         //     console.log("Base64 Data:" + base64);
+    //         //     const url = URL.createObjectURL(new Blob([base64]));
+    //         //     setvideoUrl(url);
+    //         // } catch (error) {
+    //         //     console.error('Error reading file:', error);
+    //         // }
+
     //     };
 
     //     loadVideo();
-    // }, [videoPath]);
+    // }, []);
+
+
+
 
     return (
 
@@ -125,10 +137,8 @@ function EditorPage({ videoPath }) {
                         <span className='text-primary_color ml-3'>Add Subtitle</span></div>
 
                 </div>
-
-
                 <div className="flex-1 flex flex-col bg-customGray items-center justify-center pl-5 pr-5 pt-3  rounded">
-                    <video className="w-10/12 bg-black mb-4" src={videoPath} controls autoPlay></video>
+                    <video className="w-10/12 bg-black mb-4" src={projectData.video} controls autoPlay></video>
                     <input type="range" min="0" max="100" className="w-10/12 mb-3" />
                     <div className="flex justify-evenly w-full">
                         <span className="text-white ml-4">00:10:33:15</span>

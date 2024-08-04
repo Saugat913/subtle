@@ -3,6 +3,8 @@ import EditorPage from "./pages/editor_page";
 import HomePage from "./pages/home_page";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProjectCreationPage from "./pages/project_creation_page";
+import Drag from "./components/drag_and_drop";
+
 
 
 function App() {
